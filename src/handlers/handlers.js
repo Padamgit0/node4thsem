@@ -44,10 +44,21 @@ let UpdateStudent = async (req, res) => {
     )
     res.status(200).json({
         message: "student updated successfully",
-        data: UpdateStudent
+        data: updatedStudent
     })
 }
 let DeleteStudent = async (req, res) => {
+    let id = req.params.id
+    let deletedStudent = await prisma.students.delete({
+        where: {
+            id: Number(id),
+
+        }
+    })
+    res.status(200).json({
+        message: `student with id ${id} deleted successfully`,
+        data: deletedStudent
+    })      
 
 }
 export { FindAllStudents, FindStudentById, CreateStudent, UpdateStudent, DeleteStudent }

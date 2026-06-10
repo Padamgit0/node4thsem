@@ -4,20 +4,81 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider     = "prisma-client-js"
+  output       = "../src/generated/prisma"
   moduleFormat = "esm"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
 // students table
-model Students{
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
-  rollNo Int
-  CreatedAt DateTime @default(now())
-  UpdatedAt DateTime @default(now())
+model Student {
+  student_id Int    @id @default(autoincrement())
+  name       String
+  email      String @unique
+  //for databse column rename use @map
+  rollNo     Int    @map("roll_no")
+
+  CreatedAt    DateTime   @default(now()) @map("created_at")
+  UpdatedAt    DateTime   @default(now()) @map("updated_at")
+  departmentId Int        @map("department_id") // for database column rename use @map
+  department   Department @relation(fields: [departmentId], references: [id]) // Belongs to one department
+  enrollments Enrollment[] // one-to-many relationship with Enrollment model , one student can have many enrollments
+
+  @@map("students") // for table rename use @@map
+}
+
+model Teacher {
+  id           Int        @id @default(autoincrement())
+  email        String
+  name         String     @unique
+  departmentId Int        @map("department_id") // for database column rename use @map
+  department   Department @relation(fields: [departmentId], references: [id]) // Belongs to one department
+  CreatedAt    DateTime   @default(now()) @map("created_at")
+  UpdatedAt    DateTime   @default(now()) @map("updated_at")
+  courses      Course[] // one-to-many relationship with Course model , one teacher can teach many courses
+
+  @@map("teachers") // for table rename use @@map
+}
+
+model Department {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  CreatedAt DateTime  @default(now()) @map("created_at")
+  UpdatedAt DateTime  @updatedAt @map("updated_at")
+  teachers  Teacher[] // one-to-many relationship with Teacher model
+  students  Student[] // one-to-many relationship with Student model
+
+  @@map("departments") // for table rename use @@map
+}
+
+model Course {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  credits    Int
+  teacher_id Int      @map("teacher_id") // for database column rename use @map
+  CreatedAt  DateTime @default(now())
+  UpdatedAt  DateTime @updatedAt
+
+  teacher Teacher @relation(fields: [teacher_id], references: [id]) // Belongs to one teacher
+  enrollments Enrollment[] // one-to-many relationship with Enrollment model , one course can have many enrollments
+
+  @@map("courses") // for table rename use @@map
+}
+
+model Enrollment {
+  id         Int      @id @default(autoincrement())
+  StudentId  Int      @map("student_id") // for database column rename use @map
+  student   Student  @relation(fields: [StudentId], references: [student_id]) // Belongs to one student
+  CourseId   Int      @map("course_id") // for database column rename use @map
+  course    Course   @relation(fields: [CourseId], references: [id]) // Belongs to one course
+  CreatedAt  DateTime @default(now()) @map("created_at")
+  UpdatedAt  DateTime @default(now()) @map("updated_at")
+  enrolledAt DateTime @default(now()) @map("enrolled_at")
+  status     String   @default("Active")
+  @@unique([StudentId, CourseId]) // to ensure a student can enroll in a course only once
+
+  @@map("enrollments") // for table rename use @@map
 }
