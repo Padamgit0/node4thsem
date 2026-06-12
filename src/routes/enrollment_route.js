@@ -1,13 +1,9 @@
-import express from "express"
-
-const router = express.Router()
-
-router.post("/", (req, res) => {
-    res.json({ message: "Enrollment created successfully" })
-})
-
-router.get("/", (req, res) => {
-    res.json({ message: "Enrollments fetched successfully" })
-})
-
+import { Router } from "express";
+import { CreateEnrollment, DeleteEnrollment, getEnrollments, getEnrollmentById, UpdateEnrollment } from "../handlers/enrollment_handler.js";
+let router=Router()
+router.get("/",getEnrollments)
+router.get("/:id",getEnrollmentById)
+router.post("/",CreateEnrollment)
+router.put("/:id",UpdateEnrollment)
+router.delete("/:id",DeleteEnrollment)
 export default router

@@ -2,7 +2,7 @@ import { PrismaClient } from '../generated/prisma/index.js'
 
 const prisma = new PrismaClient()
 
-export const createEnrollment = async (req, res) => {
+export const CreateEnrollment = async (req, res) => {
     try {
         const { StudentId, CourseId } = req.body
 
